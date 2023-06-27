@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.getHeader()}"></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="header :: header"></header>
+<div class="container">
+    <div class="text-center">
+        <h1>
+            <a th:text="${post.getHeader()}"></a>
+        </h1>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="text-center">
+        Author name:
+        <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${post.getUserId()})}"></a>
+        <p th:text="${'Date create: ' + post.getDateCreate()}"></p>
+        <a>Post category: </a>
+        <a th:text="${post.getNewsCategory()}"></a>
+        <p>
+            Text:
+            <a th:text="${post.getPostData()}"></a>
+        </p>
+        <p>
+            <a th:href="@{/editPost/{id}(id=${post.getId()})}"  th:if="${post.getUserId()==user.getId()}">Edit</a>
+            <a th:href="@{/deletePost/{id}(id=${post.getId()})}" th:if="${post.getUserId()==user.getId()}">Delete</a>
+        </p>
+        <p>
+            <a class="me-3 py-2" th:href="@{/editPost/{id}(id=${post.getId()})}" th:if="${#request.isUserInRole('ADMIN')}">Admin edit</a>
+            <a class="me-3 py-2" th:href="@{/deletePost/{id}(id=${post.getId()})}" th:if="${#request.isUserInRole('ADMIN')}">Admin delete</a>
+        </p>
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5">
+                <div class="col-1">
+                    <form th:method="get" th:action="@{/addReating/{id}/{postId}/{sendRating}(postId=${post.getId()}, id=${post.getUserId()}, sendRating=1)}">
+                        <button type="submit" class="btn btn-outline-primary">1</button>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <form th:method="get" th:action="@{/addReating/{id}/{postId}/{sendRating}(postId=${post.getId()}, id=${post.getUserId()}, sendRating=2)}">
+                        <button type="submit" class="btn btn-outline-primary">2</button>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <form th:method="get" th:action="@{/addReating/{id}/{postId}/{sendRating}(postId=${post.getId()}, id=${post.getUserId()}, sendRating=3)}">
+                        <button type="submit" class="btn btn-outline-primary">3</button>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <form th:method="get" th:action="@{/addReating/{id}/{postId}/{sendRating}(postId=${post.getId()}, id=${post.getUserId()}, sendRating=4)}">
+                        <button type="submit" class="btn btn-outline-primary">4</button>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <form th:method="get" th:action="@{/addReating/{id}/{postId}/{sendRating}(postId=${post.getId()}, id=${post.getUserId()}, sendRating=5)}">
+                        <button type="submit" class="btn btn-outline-primary">5</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <form th:method="post" th:action="@{/addComment/{postId}(postId=${post.getId()})}">
+            <h5><label class="form-label" style = "margin-left: 20px">Text of your comment</label></h5>
+            <p><textarea cols="20" rows="3" name="commentText" placeholder="Text of comment" class="form-control"></textarea></p>
+            <button type="submit" class="btn btn-outline-success btn-sm">Send</button>
+        </form>
+    </div>
+
+    <div class="text-center">
+<!--        добавить вывод всех комментариев к этому посту-->
+    </div>
+</div>
+</body>
+</html>

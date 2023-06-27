@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All warning list</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="header :: header"></header>
+<div class="container">
+  <div class="text-center">
+      <h1>All warning list</h1>
+  </div>
+
+  <hr class="my-4">
+
+    <div class="container overflow-hidden">
+        <div class="row row-gy-5">
+            <div class="col">
+                <form th:metod="get" action="/allWarningList">
+                    <button type="submit" class="btn btn-primary">Update warning list</button>
+                </form>
+            </div>
+            <div class="col">
+                <div class="d-flex justify-content-end">
+                    <form th:method="get" action="/openAddWarningPage">
+                        <button type="submit" class="btn btn-warning">Add warning</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${warningList != null}">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
+            <div th:each = "warning : ${warningList}">
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <h5 th:text="${warning.getHeading()}" class="card-text"></h5>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <div>
+                                    <a>Warning text: </a>
+                                    <p th:text="${warning.getText()}" class="fst-italic"></p>
+                                </div>
+                                <div th:each = "user : ${userList}">
+                                    <div th:if="${user.getId() == warning.getUserGetNotification()}">
+                                        <a>User get:</a>
+                                        <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${warning.getUserGetNotification()})}"></a>
+                                    </div>
+                                    <div th:if="${user.getId() == warning.getAdminSendNotificationId()}">
+                                        <a>Admin send:</a>
+                                        <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${warning.getAdminSendNotificationId()})}"></a>
+                                    </div>
+                                </div>
+                            </small>
+                            <form th:method="get" th:action="@{/acceptWarning/{warningId}(warningId=${warning.getId()})}">
+                                <button type="submit" class="btn btn-success btn-sm">Accept warning</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

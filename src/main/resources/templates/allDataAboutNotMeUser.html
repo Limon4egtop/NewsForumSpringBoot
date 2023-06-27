@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${userInfo.getFirstName() + ' ' + userInfo.getLastName()}">User Data</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<header th:insert="header :: header"></header>
+<div class="container">
+  <div class="text-center">
+    <p>Full info about</p>
+    <h1>
+      <th:h1 th:text="${userInfo.getFirstName() + ' ' + userInfo.getLastName()}"></th:h1>
+    </h1>
+  </div>
+
+  <hr class="my-4">
+
+  <div class="text-center">
+    <div th:if="${userInfo != null}">
+        <a th:text="${'Name:' + userInfo.getFirstName()}"></a>
+        <a th:text="${userInfo.getLastName()}"></a>
+      <p th:text="${'Email: ' + userInfo.getEmail()}"></p>
+      <p th:text="${'Phone number: ' + userInfo.getPhoneNumber()}"></p>
+      <p th:text="${'Rating: ' + userInfo.getRating()}"></p>
+        <a th:href="@{/userSubscription/{id}(id=${userInfo.getId()})}">Subscriptions</a>
+    </div>
+    <div th:if="${subscrStatus == 'False'}">
+    <form th:metod="get" th:action="@{/Subscribe/{id}(id=${userInfo.getId()})}">
+      <button type="submit" class="btn btn-danger">Subscribe</button>
+    </form>
+    </div>
+    <div th:unless="${subscrStatus == 'False'}">
+      <form th:metod="get" th:action="@{/Unsubscribe/{id}(id=${userInfo.getId()})}">
+        <button type="submit" class="btn btn-secondary">Unsubscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <form th:method="post" th:action="@{/updatePostListInUserProfile/{id}(id=${userInfo.getId()})}">
+    <button type="submit" class="btn btn-primary">Update Post List</button>
+    <select name="postCategory" class="form-select" aria-label="Default select example">
+      <option selected disabled>News category filter</option>
+      <option value="Sport">Sport</option>
+      <option value="Animals">Animals</option>
+      <option value="Business">Business</option>
+    </select>
+  </form>
+
+  <div th:if="${postsList != null}">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
+      <div th:each="post : ${postsList}">
+        <div class="col">
+          <div class="card shadow-sm">
+            <h5 th:text="${post.getHeader()}" class="card-text"></h5>
+            <div class="card-body">
+              <small class="text-muted">
+                <div>
+                  <a>Post category: </a>
+                  <a th:text="${post.getNewsCategory()}"></a>
+                </div>
+                <div th:each = "user : ${userList}">
+                  <div th:if="${user.getId() == post.getUserId()}">
+                    <a>Author:</a>
+                    <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${post.getUserId()})}"></a>
+                  </div>
+                </div>
+                <a th:text="${post.getDateCreate()}"></a>
+              </small>
+              <form th:method="get" th:action="@{/openPost/{id}(id=${post.getId()})}">
+                <button type="submit" class="btn btn-info">Show more</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

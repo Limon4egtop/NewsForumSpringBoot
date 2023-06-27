@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Post</title>
+</head>
+<body>
+<form th:method="post" action="/editedPostSend">
+  <fieldset>
+    <legend>Edit post</legend>
+    <input type="text" name="postData" th:value="${postData}" placeholder="Text of your post">
+    <br>
+    <button type="submit">Edit</button>
+  </fieldset>
+</form>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register User</title>
+</head>
+<body>
+<form th:method="post" action="/newUser">
+  <fieldset>
+    <legend>Registration form</legend>
+    <input type="text" name="firstName" placeholder="firstName" th:value="${userFirstName}">
+    <br>
+    <input type="text" name="lastName" placeholder="lastName" th:value="${userLastName}">
+    <br>
+    <input type="text" name="phoneNumber" placeholder="phoneNumber"  th:value="${userPhoneNumber}">
+    <br>
+    <input type="text" name="email" placeholder="email" th:value="${userEmail}">
+    <button type="submit">Add</button>
+  </fieldset>
+</form>
+<div th:if="${status != null}">
+<p th:text="${status}"></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class ="container">
+  <header>
+    <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
+      <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/allWarningList" th:if="${#request.isUserInRole('ADMIN')}">All warning users</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/allUserList" th:if="${#request.isUserInRole('ADMIN')}">All users</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" th:if="${#request.isUserInRole('ADMIN')}">|</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/">Main</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/getMainPostPage" th:if="${#request.isUserInRole('USER')}">Add</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/userLogin" th:unless="${#request.isUserInRole('USER')}">LogIn</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/allDataAboutUser" th:if="${#request.isUserInRole('USER')}">My profile</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/mySubscription" th:if="${#request.isUserInRole('USER')}">My subscription</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/myWarnings" th:if="${#request.isUserInRole('USER')}">My Warnings</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/logout" th:if="${#request.isUserInRole('USER')}">Logout</a>
+      </nav>
+    </div>
+  </header>
+</div>
+</body>
+</html>
