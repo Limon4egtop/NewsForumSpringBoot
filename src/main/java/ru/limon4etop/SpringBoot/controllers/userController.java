@@ -21,6 +21,7 @@ import ru.limon4etop.SpringBoot.repos.ratingRepo;
 import ru.limon4etop.SpringBoot.repos.subscriptionRepo;
 import ru.limon4etop.SpringBoot.repos.commentRepo;
 
+import ru.limon4etop.SpringBoot.models.UserData;
 
 @Controller
 public class userController {
@@ -139,6 +140,13 @@ public class userController {
         post = postRepo.findById(id);
         model.addAttribute("post", post);
         model.addAttribute("user", userRepo.findUserById(getAuthenticationUserId()));
+        model.addAttribute("commentList", commentRepo.findByPostId(id));
+//        List<UserData> usersSendCommentList = new ArrayList<>();
+//        for (Comment comment : commentRepo.findByPostId(id)) {
+//            usersSendCommentList.add(userRepo.findUserById(comment.getUserSendCommentId()));
+//        }
+//        System.out.println(" ");
+//        model.addAttribute("userSendCommentList", usersSendCommentList);
         return "myPost";
     }
 

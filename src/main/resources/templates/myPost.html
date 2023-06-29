@@ -74,7 +74,17 @@
     </div>
 
     <div class="text-center">
-<!--        добавить вывод всех комментариев к этому посту-->
+        <div th:if="${commentList != null}">
+            <div th:each="comment : ${commentList}">
+                    <div class="form-control">
+                        <p class="text-start fs-6">
+                            <a th:text="${'Opent autor page'}" th:href="@{/getDataAboutUser/{id}(id=${comment.getUserSendCommentId()})}"></a>
+                        </p>
+                        <p th:text="${comment.getText()}" class="text-sm-start text-break fs-5"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>
