@@ -45,7 +45,7 @@ public class mainController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request, Model model) throws ServletException {
+    public String logout(HttpServletRequest request) throws ServletException {
         request.logout();
         return "redirect:/";
     }

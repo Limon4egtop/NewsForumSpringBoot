@@ -41,7 +41,7 @@ class securityConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("/api/service/**", "/", "/newUser").permitAll()
+                .antMatchers("/api/service/**", "/").permitAll()
                 .antMatchers("/addNewPost", "/addReating", "/allDataAboutUser",
                         "/mySubscription").hasRole("USER")
                 .antMatchers("/addWarning", "/openAddWarningPage", "/allWarningList",
