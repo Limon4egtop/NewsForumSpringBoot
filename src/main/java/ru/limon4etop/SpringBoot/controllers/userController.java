@@ -26,7 +26,6 @@ import ru.limon4etop.SpringBoot.models.UserData;
 @Controller
 public class userController {
     private userRepo userRepo;
-
     private postRepo postRepo;
     private ratingRepo ratingRepo;
     private subscriptionRepo subscriptionRepo;

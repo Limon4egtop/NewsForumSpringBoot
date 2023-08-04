@@ -26,7 +26,7 @@ public class adminController {
     }
 
     @GetMapping("/myWarnings")
-    private String myWarnings(Model model) {
+    public String myWarnings(Model model) {
         model.addAttribute("userWarningList",
                 warningRepo.findByUserGetNotification(getAuthenticationUserId()));
         return "warningPage";
@@ -71,7 +71,3 @@ public class adminController {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
-
-
-
-//3) Придумать систему обработки большого количества наплыва оценок.
