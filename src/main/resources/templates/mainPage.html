@@ -14,45 +14,54 @@
 
     <hr class="my-4">
 
-<form th:method="post" action="/updatePostList">
-    <button type="submit" class="btn btn-primary">Update post list</button>
-    <select name="postCategory" class="form-select" aria-label="Default select example">
-        <option selected disabled>News category filter</option>
-        <option value="Sport">Sport</option>
-        <option value="Animals">Animals</option>
-        <option value="Business">Business</option>
-    </select>
-</form>
-
-<div th:if="${postsList != null}">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
-        <div th:each = "post : ${postsList}">
+    <div class="container">
+        <div class="row">
             <div class="col">
-                <div class="card shadow-sm">
-                    <h5 th:text="${post.getHeader()}" class="card-text"></h5>
-                    <div class="card-body">
-                        <small class="text-muted">
-                            <div>
-                                <a>Post category: </a>
-                                <a th:text="${post.getNewsCategory()}"></a>
-                            </div>
-                            <div th:each = "user : ${userList}">
-                                <div th:if="${user.getId() == post.getUserId()}">
-                                    <a>Author:</a>
-                                    <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${post.getUserId()})}"></a>
+                <form th:method="post" action="/updatePostList">
+                    <button type="submit" class="btn btn-primary">Update post list</button>
+                    <select name="postCategory" class="form-select" aria-label="Default select example">
+                        <option selected disabled>News category filter</option>
+                        <option value="Sport">Sport</option>
+                        <option value="Animals">Animals</option>
+                        <option value="Business">Business</option>
+                    </select>
+                    <div class="col">
+                        <input type="text" name="searchText" placeholder="Text to search" class="form-control">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${postsList != null}">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-3">
+            <div th:each = "post : ${postsList}">
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <h5 th:text="${post.getHeader()}" class="card-text"></h5>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <div>
+                                    <a>Post category: </a>
+                                    <a th:text="${post.getNewsCategory()}"></a>
                                 </div>
-                            </div>
-                            <a th:text="${post.getDateCreate()}"></a>
-                        </small>
-                        <form th:method="get" th:action="@{/openPost/{id}(id=${post.getId()})}">
-                            <button type="submit" class="btn btn-info">Show more</button>
-                        </form>
+                                <div th:each = "user : ${userList}">
+                                    <div th:if="${user.getId() == post.getUserId()}">
+                                        <a>Author:</a>
+                                        <a th:text="${user.getFirstName()}" th:href="@{/getDataAboutUser/{id}(id=${post.getUserId()})}"></a>
+                                    </div>
+                                </div>
+                                <a th:text="${post.getDateCreate()}"></a>
+                            </small>
+                            <form th:method="get" th:action="@{/openPost/{id}(id=${post.getId()})}">
+                                <button type="submit" class="btn btn-info">Show more</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 </body>
 </html>

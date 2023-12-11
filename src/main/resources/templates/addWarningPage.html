@@ -16,13 +16,13 @@
   <hr class="my-4">
 
     <div class="text-center">
-        <form th:method="post" action="/addWarning">
+        <form th:method="post" th:action="@{/addWarning}" th:object="${addWarning}">
             <label class="form-label" style = "margin-left: 20px">Title</label>
-            <p><input type="text" name="headOfWarning" placeholder="Title of warning" class="form-control"></p>
+            <p><input type="text" name="heading" id="heading" field="*{heading}" placeholder="Title of warning" class="form-control"></p>
             <label class="form-label" style = "margin-left: 20px">Text of warning</label>
-            <p><textarea cols="30" rows="5" name="warningText" placeholder="Text of warning" class="form-control"></textarea></p>
+            <p><textarea cols="30" rows="5" name="text" id="text" field="text" placeholder="Text of warning" class="form-control"></textarea></p>
             <label class="form-label" style = "margin-left: 20px">User who get warning</label>
-            <select name="userGetWarning" class="form-select" aria-label="Default select example">
+            <select name="userGetNotification" id="userGetNotification" field="userGetNotification" class="form-select" aria-label="Default select example">
                 <option selected disabled>Select the user</option>
                 <option th:each="user : ${userList}" th:value="${user.getId()}" th:text="${user.getFirstName() + user.getLastName()}">
                 </option>

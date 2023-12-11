@@ -10,7 +10,7 @@
     <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
         <a class="me-3 py-2 text-dark text-decoration-none" href="/allWarningList" th:if="${#request.isUserInRole('ADMIN')}">All warning users</a>
-        <a class="me-3 py-2 text-dark text-decoration-none" href="/allUserList" th:if="${#request.isUserInRole('ADMIN')}">All users</a>
+        <a class="me-3 py-2 text-dark text-decoration-none" href="/allUserListPage" th:if="${#request.isUserInRole('ADMIN')}">All users</a>
         <a class="me-3 py-2 text-dark text-decoration-none" th:if="${#request.isUserInRole('ADMIN')}">|</a>
         <a class="me-3 py-2 text-dark text-decoration-none" href="/">Main</a>
         <a class="me-3 py-2 text-dark text-decoration-none" href="/getMainPostPage" th:if="${#request.isUserInRole('USER')}">Add</a>

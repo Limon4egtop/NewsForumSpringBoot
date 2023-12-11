@@ -1,92 +1,69 @@
 package ru.limon4etop.SpringBoot.controllers;
 
-import org.bouncycastle.math.raw.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+import ru.limon4etop.SpringBoot.Services.impl.PostServiceImp;
+import ru.limon4etop.SpringBoot.Services.impl.RatingServiceImp;
+import ru.limon4etop.SpringBoot.Services.impl.SubscritionServiceImp;
+import ru.limon4etop.SpringBoot.Services.impl.UserServiceImp;
 import ru.limon4etop.SpringBoot.models.*;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import ru.limon4etop.SpringBoot.repos.postRepo;
-import ru.limon4etop.SpringBoot.repos.userRepo;
-import ru.limon4etop.SpringBoot.repos.ratingRepo;
-import ru.limon4etop.SpringBoot.repos.subscriptionRepo;
-import ru.limon4etop.SpringBoot.repos.commentRepo;
 
 import ru.limon4etop.SpringBoot.models.UserData;
 
 @Controller
-public class userController {
-    private userRepo userRepo;
-    private postRepo postRepo;
-    private ratingRepo ratingRepo;
-    private subscriptionRepo subscriptionRepo;
-    private commentRepo commentRepo;
+public class userController extends mainController{
+    private RatingServiceImp ratingServiceImp;
+    private SubscritionServiceImp subscritionServiceImp;
 
     @Autowired
-    public userController(userRepo userRepo, postRepo postRepo, ratingRepo ratingRepo, subscriptionRepo subscriptionRepo, commentRepo commentRepo) {
-        this.userRepo = userRepo;
-        this.postRepo = postRepo;
-        this.ratingRepo = ratingRepo;
-        this.subscriptionRepo = subscriptionRepo;
-        this.commentRepo = commentRepo;
+    public userController(final RatingServiceImp ratingServiceImp,
+                          final SubscritionServiceImp subscritionServiceImp,
+                          final PostServiceImp postServiceImp,
+                          final UserServiceImp userServiceImp) {
+        super(userServiceImp, postServiceImp);
+        this.ratingServiceImp = ratingServiceImp;
+        this.subscritionServiceImp = subscritionServiceImp;
     }
 
-    @PostMapping("/newUser")
-    public String newUser(@RequestParam(value = "firstName", required = false) String firstName,
-                  @RequestParam(value = "lastName", required = false) String lastName,
-                  @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
-                  @RequestParam(value = "email", required = false) String email,
-                  Model model){
-        if ((!Objects.equals(firstName, "")) && (!Objects.equals(lastName, "")) &&
-                (!Objects.equals(phoneNumber, "")) && (!Objects.equals(email, ""))) {
-            UserData userData = new UserData();
-            userData.setEmail(email);
-            userData.setFirstName(firstName);
-            userData.setLastName(lastName);
-            userData.setPhoneNumber(phoneNumber);
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();     //берем инфу об авторезированном пользователе
-            userData.setId(authentication.getName());        //получем id авторизованного пользователя
-            userData.setRating(0);
-            userRepo.save(userData);
-            model.addAttribute("status", "ok");
+    @GetMapping("/allUserListPage")
+    public RedirectView allUserListPage(final RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("userList", userServiceImp.getAllUsersData());
+        return new RedirectView("/getAllUserList");
+    }
+
+    @PostMapping("/refreshUserData")
+    public RedirectView refreshUserData(@ModelAttribute("refreshUserData") final UserData userData,
+                                        final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("status",
+                saveUserData(userData));
+        return new RedirectView("/getMainPage");
+    }
+
+    private String saveUserData (final UserData userData) {
+        if ((!Objects.equals(userData.getFirstName(), "")) && (!Objects.equals(userData.getLastName(), "")) &&
+                (!Objects.equals(userData.getPhoneNumber(), "")) && (!Objects.equals(userData.getEmail(), ""))) {
+            userData.setId(getAuthenticationUserId());
+            userServiceImp.addUser(userData);
+            return "ok";
         }
         else {
-            model.addAttribute("status", "error");
+            return "error";
         }
-        return "mainPage";
     }
 
-    @PostMapping("/addNewPost")
-    public String addNewPost(@RequestParam(value = "headOfPost", required = false) String headerPost,
-                             @RequestParam(value = "postData", required = false) String postText,
-                             @RequestParam(value = "postCategory", required = false) String postCategory,
-                             Model model) {
-        if (!Objects.equals(postText, "")) {
-            Post post = new Post();
-            post.setUserId(getAuthenticationUserId());
-            post.setHeader(headerPost);
-            post.setDateCreate(Date.from(Instant.now()));
-            post.setPostData(postText);
-            post.setNewsCategory(postCategory);
-            postRepo.save(post);
-            model.addAttribute("status", "post added");
-        }
-        return "mainPostPage";
-    }
-
-    @GetMapping("/addReating/{id}/{postId}/{sendRating}")
-    public String addReating(@PathVariable("id") String postUserId,
-                             @PathVariable("postId") Integer postId,
-                             @PathVariable("sendRating") Integer ratData) {
+    @GetMapping("/addRatingToUser/{id}/{postId}/{sendRating}")
+    public RedirectView calculateUserRating(@PathVariable("id") final String postUserId,
+                                      @PathVariable("postId") final Integer postId,
+                                      @PathVariable("sendRating") final Integer ratData) {
+        // TODO: избавиться с помощью паттернов
         switch (ratData) {
             case 1:
                 addNewRating(-2, postUserId, getAuthenticationUserId(), postId);
@@ -104,213 +81,103 @@ public class userController {
                 addNewRating(2, postUserId, getAuthenticationUserId(), postId);
                 break;
         }
-        return "redirect:/";
+        return new RedirectView("/");
     }
 
-    @GetMapping("/favicon.ico")
-    public String redirectFavicon(){
-        return "redirect:/";
-    }
-
-    public void addNewRating(Integer ratData, String postUserId, String addUserId, Integer postId){
-        Rating rating = new Rating();
-        rating.setPostId(postId);
-        rating.setRatData(ratData);
-        rating.setUserId(postUserId);
-        rating.setAddUserId(addUserId);
-        if (ratingRepo.findByUserIdAndAddUserId(postUserId, addUserId) != null){
-            rating.setId(ratingRepo.findByUserIdAndAddUserId(postUserId, addUserId).getId());
+    private void addNewRating(final Integer ratData,
+                             final String postUserId,
+                             final String addUserId,
+                             final Integer postId) {
+        Rating rating = new Rating(postUserId, addUserId, postId, ratData);
+        if (ratingServiceImp.findByUserIdAndAddUserId(postUserId, addUserId) != null){
+            rating.setId(ratingServiceImp.findByUserIdAndAddUserId(postUserId, addUserId).getId());
         }
-        ratingRepo.save(rating);
-        List<Rating> ratingList = ratingRepo.findByUserId(postUserId);
-        UserData userData = userRepo.findUserById(postUserId);
+        ratingServiceImp.saveRatingData(rating);
+        UserData userData = userServiceImp.findUserById(postUserId);
         Integer ratSumm = 0;
-        for (Rating rating1 : ratingList) {
+        for (Rating rating1 : ratingServiceImp.findByUserId(postUserId)) {
             ratSumm += rating1.getRatData();
         }
         userData.setRating(ratSumm);
-        userRepo.save(userData);
-    }
-
-    @GetMapping("/openPost/{id}")
-    public String openPost(@PathVariable("id") Integer id,
-                           Model model) {
-        Post post = new Post();
-        post = postRepo.findById(id);
-        model.addAttribute("post", post);
-        model.addAttribute("user", userRepo.findUserById(getAuthenticationUserId()));
-        model.addAttribute("commentList", commentRepo.findByPostId(id));
-//        List<UserData> usersSendCommentList = new ArrayList<>();
-//        for (Comment comment : commentRepo.findByPostId(id)) {
-//            usersSendCommentList.add(userRepo.findUserById(comment.getUserSendCommentId()));
-//        }
-//        System.out.println(" ");
-//        model.addAttribute("userSendCommentList", usersSendCommentList);
-        return "myPost";
-    }
-
-    @GetMapping("/editPost/{id}")
-    public String editPost(@PathVariable("id") Integer id,
-                           Model model) {
-        model.addAttribute("postId", id);
-        model.addAttribute("postData", postRepo.findById(id).getPostData());
-        model.addAttribute("postUserName", userRepo.findUserById(postRepo.findById(id).getUserId()).getFirstName());
-        return "editPostPage";
-    }
-
-    @GetMapping("/editUserData/{id}")
-    public String editUserData(@PathVariable("id") String id,
-                               Model model) {
-        UserData user = userRepo.findUserById(id);
-        model.addAttribute("userId", user.getId());
-        model.addAttribute("userFirstName", user.getFirstName());
-        model.addAttribute("userLastName", user.getLastName());
-        model.addAttribute("userPhoneNumber", user.getPhoneNumber());
-        model.addAttribute("userEmail", user.getEmail());
-        return "registrUser";
+        userServiceImp.addUser(userData);
     }
 
     @GetMapping("/userLogin")
     public String userLogin() {
-        if (userRepo.findUserById(getAuthenticationUserId()) == null) {
-            return "registrUser";
+        if (userServiceImp.findUserById(getAuthenticationUserId()) == null) {
+            return "redirect:/getRegisterUser";
         }
-        return "mainPage";
+        return "redirect:/getMainPage";
     }
 
     @GetMapping("/Subscribe/{id}")
-    public String Subscribe(@PathVariable("id") String userId) {
-        Subscription subscription = new Subscription();
-        subscription.setSubscribeUserId(userId);
-        subscription.setFollowUserId(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (subscriptionRepo.findByFollowUserIdAndSubscribeUserId(SecurityContextHolder.getContext()
-                .getAuthentication().getName(), userId) != null) {
-            subscription.setId((subscriptionRepo.findByFollowUserIdAndSubscribeUserId(SecurityContextHolder.getContext()
-                    .getAuthentication().getName(), userId).getId()));
-        }
-        subscriptionRepo.save(subscription);
-        return "redirect:/getDataAboutUser/"+userId;
+    public RedirectView Subscribe(@PathVariable("id") final String userId) {
+        subscritionServiceImp.saveSubscritionData(editSubscriptionData(userId));
+        return new RedirectView("/getDataAboutUser/"+userId);
     }
 
     @GetMapping("/Unsubscribe/{id}")
-    public String Unsubscribe(@PathVariable("id") String userId) {
-        Subscription subscription = new Subscription();
-        subscription.setSubscribeUserId(userId);
-        subscription.setFollowUserId(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (subscriptionRepo.findByFollowUserIdAndSubscribeUserId(SecurityContextHolder.getContext()
-                .getAuthentication().getName(), userId) != null) {
-            subscription.setId((subscriptionRepo.findByFollowUserIdAndSubscribeUserId(SecurityContextHolder.getContext()
-                    .getAuthentication().getName(), userId).getId()));
-        }
-        subscriptionRepo.delete(subscription);
-        return "redirect:/getDataAboutUser/"+userId;
+    public RedirectView Unsubscribe(@PathVariable("id") final String userId) {
+        subscritionServiceImp.deleteSubscrition(editSubscriptionData(userId));
+        return new RedirectView("/getDataAboutUser/"+userId);
     }
 
-    @PostMapping("/editedPostSend/{id}")
-    public String editedPostSend(@PathVariable("id") Integer id,
-                                 @RequestParam(value = "postData", required = false) String postText,
-                                 Model model) {
-        if (!Objects.equals(postText, "")) {
-            Post post = new Post();
-            post.setId(id);
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            post.setUserId(authentication.getName());
-            post.setPostData(postText);
-            postRepo.save(post);
-            model.addAttribute("status", "post edited");
-        }
-        return "mainPostPage";
+    private Subscription editSubscriptionData (final String userId) {
+        Subscription subscription = new Subscription(getAuthenticationUserId(), userId);
+        subscription.setId(checkSubscriptionData(userId));
+        return subscription;
     }
 
-    @GetMapping("/deletePost/{id}")
-    public String deletePost(@PathVariable("id") Integer id,
-                             Model model){
-        postRepo.delete(postRepo.findById(id));
-        model.addAttribute("status", "post deletsd");
-        return "mainPage";
+    private Integer checkSubscriptionData(final String userId) {
+        if (subscritionServiceImp.findSubscrByFollowUserIdAndSubscrUserId(getAuthenticationUserId(), userId) != null) {
+            return subscritionServiceImp.findSubscrByFollowUserIdAndSubscrUserId(getAuthenticationUserId(), userId).getId();
+        }
+        return null;
     }
 
     @GetMapping("/getDataAboutUser/{id}")
-    public String getDataAboutUser(@PathVariable("id") String id,
-                                   Model model) {
-        model.addAttribute("userInfo", userRepo.findUserById(id));
-        model.addAttribute("postsList", postRepo.findByUserId(id));
-        if (Objects.equals(getAuthenticationUserId(), id)) {
-            return "allDataAboutUser";
+    public RedirectView getDataAboutUser(@PathVariable("id") final String userId,
+                                   final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("userInfo", userServiceImp.findUserById(userId));
+        redirectAttributes.addFlashAttribute("postsList", postServiceImp.findPostsByUserId(userId));
+        if (Objects.equals(getAuthenticationUserId(), userId)) {
+            return new RedirectView("/getAllDataAboutUser");
         }
         else {
-            if (subscriptionRepo.findByFollowUserIdAndSubscribeUserId(getAuthenticationUserId(), id) != null){
-                model.addAttribute("subscrStatus", "True");
+            if (subscritionServiceImp.findSubscrByFollowUserIdAndSubscrUserId(getAuthenticationUserId(), userId) != null){
+                redirectAttributes.addFlashAttribute("subscrStatus", "True");
             }
             else {
-                model.addAttribute("subscrStatus", "False");
+                redirectAttributes.addFlashAttribute("subscrStatus", "False");
             }
-            model.addAttribute("postsList", postRepo.findByUserId(id));
-            return "allDataAboutNotMeUser";
+            return new RedirectView("/getAllDataAboutNotMeUser");
         }
     }
 
     @GetMapping("/allDataAboutUser")
-    public String allDataAboutUser(Model model) {
-        model.addAttribute("userInfo", userRepo.findUserById(getAuthenticationUserId()));
-        model.addAttribute("postsList", postRepo.findByUserId(getAuthenticationUserId()));
-        return "allDataAboutUser";
+    public RedirectView allDataAboutUser(final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("userInfo", userServiceImp.findUserById(getAuthenticationUserId()));
+        redirectAttributes.addFlashAttribute("postsList", postServiceImp.findPostsByUserId(getAuthenticationUserId()));
+        return new RedirectView("/getAllDataAboutUser");
     }
 
     @GetMapping("/mySubscription")
-    public String mySubscription(Model model) {
-        return "redirect:/userSubscription/"+getAuthenticationUserId();
+    public RedirectView mySubscription() {
+        return new RedirectView("/userSubscription/"+getAuthenticationUserId());
     }
 
     @GetMapping("/userSubscription/{id}")
-    public String userSubscription(@PathVariable("id") String id,
-                                  Model model) {
+    public RedirectView userSubscriptionData(@PathVariable("id") final String id,
+                                             final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("subscrUsersDataList", getDataAboutSubscriptionUsers(id));
+        return new RedirectView("/getUserSubscription");
+    }
+
+    private List<UserData> getDataAboutSubscriptionUsers(final String id) {
         List<UserData> userDataList = new ArrayList<>();
-        for (Subscription subscr : subscriptionRepo.findByFollowUserId(id)) {
-            userDataList.add(userRepo.findUserById(subscr.getSubscribeUserId()));
+        for (Subscription subscription : subscritionServiceImp.getUserByFollowId(id)) {
+            userDataList.add(userServiceImp.findUserById(subscription.getSubscribeUserId()));
         }
-        model.addAttribute("subscrUsersDataList", userDataList);
-        return "userSubscription";
-    }
-
-    @PostMapping("/updatePostListInUserProfile/{id}")
-    public String updatePostListInUserProfile(@PathVariable("id") String userId,
-                                @RequestParam(name = "postCategory", required = false) String newsCategory,
-                                 Model model) {
-        model.addAttribute("userInfo", userRepo.findUserById(userId));
-        if (newsCategory != null) {
-            model.addAttribute("postsList",
-                    postRepo.findByNewsCategoryAndUserIdOrderByDateCreate(newsCategory, userId));
-        }
-        else {
-            model.addAttribute("postsList", postRepo.findByUserId(userId));
-        }
-        if (Objects.equals(getAuthenticationUserId(), userId)) {
-            return "allDataAboutUser";
-        }
-        else {
-            if (subscriptionRepo.findByFollowUserIdAndSubscribeUserId(getAuthenticationUserId(), userId) != null){
-                model.addAttribute("subscrStatus", "True");
-            }
-            else {
-                model.addAttribute("subscrStatus", "False");
-            }
-            return "allDataAboutNotMeUser";
-        }
-    }
-
-    @PostMapping("/addComment/{postId}")
-    public String addComment(@PathVariable("postId") Integer postId,
-                             @RequestParam(value = "commentText", required = false) String textOfComment){
-        Comment comment = new Comment();
-        comment.setPostId(postId);
-        comment.setText(textOfComment);
-        comment.setUserSendCommentId(getAuthenticationUserId());
-        commentRepo.save(comment);
-        return "redirect:/openPost/{postId}";
-    }
-
-    public String getAuthenticationUserId() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+        return userDataList;
     }
 }

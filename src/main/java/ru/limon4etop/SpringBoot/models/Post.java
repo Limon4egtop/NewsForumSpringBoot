@@ -17,12 +17,26 @@ public class Post {
     private String userId;
     private String newsCategory;
 
-    public String getNewsCategory() {
-        return newsCategory;
+    public Post(String header, Date dateCreate, String postData, String userId, String newsCategory) {
+        this.header = header;
+        this.dateCreate = dateCreate;
+        this.postData = postData;
+        this.userId = userId;
+        this.newsCategory = newsCategory;
     }
 
-    public void setNewsCategory(String newsCategory) {
-        this.newsCategory = newsCategory;
+    public Post(Integer id, String postData, String userId) {
+        this.id = id;
+        this.postData = postData;
+        this.userId = userId;
+    }
+
+    public Post() {
+
+    }
+
+    public String getNewsCategory() {
+        return newsCategory;
     }
 
     public String getHeader() {
@@ -37,11 +51,6 @@ public class Post {
         return dateCreate;
     }
 
-    public void setDateCreate(Date dateCreate) {
-        this.dateCreate = dateCreate;
-    }
-
-
     public Integer getId() {
         return id;
     }
@@ -54,15 +63,23 @@ public class Post {
         return postData;
     }
 
-    public void setPostData(String postData) {
-        this.postData = postData;
-    }
-
     public String getUserId() {
         return userId;
     }
 
+    public void setDateCreate(Date dateCreate) {
+        this.dateCreate = dateCreate;
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public void setPostData(String postData) {
+        this.postData = postData;
+    }
+
+    public void setNewsCategory(String newsCategory) {
+        this.newsCategory = newsCategory;
     }
 }

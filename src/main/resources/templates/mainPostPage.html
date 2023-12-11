@@ -14,13 +14,13 @@
 
     <hr class="my-4">
     <div class="text-center">
-        <form th:method="post" action="/addNewPost">
+        <form th:method="post" th:action="@{/addNewPost}" th:object="${addNewPostData}">
             <label class="form-label" style = "margin-left: 20px">Title</label>
-                <p><input type="text" name="headOfPost" placeholder="Title of your post" class="form-control"></p>
+                <p><input type="text" name="header" id="header" field="*{header}" placeholder="Title of your post" class="form-control"></p>
             <label class="form-label" style = "margin-left: 20px">Text of post</label>
-                <p><textarea cols="30" rows="5" name="postData" placeholder="Text of your post" class="form-control"></textarea></p>
+                <p><textarea cols="30" rows="5" type="text" name="postData" id="postData" field="*{postData}" placeholder="Text of your post" class="form-control"></textarea></p>
             <label class="form-label" style = "margin-left: 20px">News category</label>
-                <select name="postCategory" class="form-select" aria-label="Default select example">
+                <select type="text" name="newsCategory" id="newsCategory" field="*{newsCategory}" class="form-select" aria-label="Default select example">
                     <option selected disabled>Select the news category</option>
                     <option value="Sport">Sport</option>
                     <option value="Animals">Animals</option>

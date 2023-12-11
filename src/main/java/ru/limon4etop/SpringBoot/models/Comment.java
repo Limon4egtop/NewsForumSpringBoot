@@ -14,6 +14,16 @@ public class Comment {
     private Integer postId;
     private String text;
 
+    public Comment(String userSendCommentId, Integer postId, String text) {
+        this.userSendCommentId = userSendCommentId;
+        this.postId = postId;
+        this.text = text;
+    }
+
+    public Comment() {
+
+    }
+
     public Integer getId() {
         return id;
     }
@@ -24,18 +34,6 @@ public class Comment {
 
     public String getUserSendCommentId() {
         return userSendCommentId;
-    }
-
-    public void setUserSendCommentId(String userSendCommentId) {
-        this.userSendCommentId = userSendCommentId;
-    }
-
-    public Integer getPostId() {
-        return postId;
-    }
-
-    public void setPostId(Integer postId) {
-        this.postId = postId;
     }
 
     public String getText() {

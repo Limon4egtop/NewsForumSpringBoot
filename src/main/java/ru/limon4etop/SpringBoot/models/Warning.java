@@ -15,12 +15,23 @@ public class Warning {
     private String heading;
     private String text;
 
-    public String getAdminSendNotificationId() {
-        return adminSendNotificationId;
+    public Warning(String userGetNotification, String adminSendNotificationId, String heading, String text) {
+        this.userGetNotification = userGetNotification;
+        this.adminSendNotificationId = adminSendNotificationId;
+        this.heading = heading;
+        this.text = text;
     }
 
-    public void setAdminSendNotificationId(String adminSendNotificationId) {
-        this.adminSendNotificationId = adminSendNotificationId;
+    public Warning(Integer id) {
+        this.id = id;
+    }
+
+    public Warning() {
+
+    }
+
+    public String getAdminSendNotificationId() {
+        return adminSendNotificationId;
     }
 
     public Integer getId() {
@@ -35,16 +46,8 @@ public class Warning {
         return userGetNotification;
     }
 
-    public void setUserGetNotification(String userGetNotification) {
-        this.userGetNotification = userGetNotification;
-    }
-
     public String getHeading() {
         return heading;
-    }
-
-    public void setHeading(String heading) {
-        this.heading = heading;
     }
 
     public String getText() {
@@ -53,5 +56,17 @@ public class Warning {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void setUserGetNotification(String userGetNotification) {
+        this.userGetNotification = userGetNotification;
+    }
+
+    public void setAdminSendNotificationId(String adminSendNotificationId) {
+        this.adminSendNotificationId = adminSendNotificationId;
+    }
+
+    public void setHeading(String heading) {
+        this.heading = heading;
     }
 }

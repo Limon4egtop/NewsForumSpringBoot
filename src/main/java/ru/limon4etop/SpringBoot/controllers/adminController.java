@@ -2,72 +2,59 @@ package ru.limon4etop.SpringBoot.controllers;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+import ru.limon4etop.SpringBoot.Services.impl.UserServiceImp;
+import ru.limon4etop.SpringBoot.Services.impl.WarningServiceImp;
 import ru.limon4etop.SpringBoot.models.Warning;
-import ru.limon4etop.SpringBoot.repos.postRepo;
-import ru.limon4etop.SpringBoot.repos.userRepo;
-import ru.limon4etop.SpringBoot.repos.warningRepo;
 
 @Controller
 public class adminController {
-    private userRepo userRepo;
+    private UserServiceImp userServiceImp;
+    private WarningServiceImp warningServiceImp;
 
-    private postRepo postRepo;
-    private warningRepo warningRepo;
-
-    public adminController(userRepo userRepo, postRepo postRepo, warningRepo warningRepo) {
-        this.userRepo = userRepo;
-        this.postRepo = postRepo;
-        this.warningRepo = warningRepo;
+    public adminController(final UserServiceImp userServiceImp,
+                           final WarningServiceImp warningServiceImp) {
+        this.userServiceImp = userServiceImp;
+        this.warningServiceImp = warningServiceImp;
     }
 
     @GetMapping("/myWarnings")
-    public String myWarnings(Model model) {
-        model.addAttribute("userWarningList",
-                warningRepo.findByUserGetNotification(getAuthenticationUserId()));
-        return "warningPage";
+    public RedirectView myWarnings(final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("userWarningList",
+                warningServiceImp.findByUserGetNotification(getAuthenticationUserId()));
+        return new RedirectView("/getWarningPage");
     }
 
     @GetMapping("/allWarningList")
-    public String allWarningList(Model model) {
-        model.addAttribute("warningList", warningRepo.findAll());
-        model.addAttribute("userList", userRepo.findAll());
-        return "allWarningPage";
+    public RedirectView allWarningList(final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("warningList", warningServiceImp.getAllWarnings());
+        redirectAttributes.addFlashAttribute("userList", userServiceImp.getAllUsersData());
+        return new RedirectView("/getAllWarningPage");
     }
 
     @GetMapping("/openAddWarningPage")
-    public String openAddWarningPage(Model model){
-        model.addAttribute("userList", userRepo.findAll());
-        return "addWarningPage";
+    public RedirectView openAddWarningPage(final RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("userList", userServiceImp.getAllUsersData());
+        return new RedirectView("/getAddWarningPage");
     }
 
     @PostMapping("/addWarning")
-    public String addWarning(@RequestParam(value = "headOfWarning", required = false) String warningTitle,
-                             @RequestParam(value = "warningText", required = false) String warningText,
-                             @RequestParam(value = "userGetWarning", required = false) String warningUserGet){
-        Warning warning = new Warning();
-        warning.setHeading(warningTitle);
-        warning.setText(warningText);
-        warning.setUserGetNotification(warningUserGet);
-        warning.setAdminSendNotificationId(getAuthenticationUserId());
-        warningRepo.save(warning);
-        return "redirect:allWarningList";
+    public RedirectView addWarning(@ModelAttribute("addWarning") final Warning warningData) {
+        warningData.setAdminSendNotificationId(getAuthenticationUserId());
+        warningServiceImp.addWarning(warningData);
+        return new RedirectView("/allWarningList");
     }
 
     @GetMapping("/acceptWarning/{warningId}")
-    public String acceptWarning(@PathVariable("warningId") Integer warnId) {
-        Warning warning = new Warning();
-        warning.setId(warnId);
-        warningRepo.delete(warning);
+    public String acceptWarning(@PathVariable("warningId") final Integer warnId) {
+        warningServiceImp.deleteWarning(warnId);
         return "redirect:/allWarningList";
     }
 
 
-    public String getAuthenticationUserId() {
+    private String getAuthenticationUserId() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

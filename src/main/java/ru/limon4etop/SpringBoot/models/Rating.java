@@ -15,12 +15,15 @@ public class Rating {
     Integer postId;
     Integer ratData;
 
-    public String getAddUserId() {
-        return addUserId;
+    public Rating(String userId, String addUserId, Integer postId, Integer ratData) {
+        this.userId = userId;
+        this.addUserId = addUserId;
+        this.postId = postId;
+        this.ratData = ratData;
     }
 
-    public void setAddUserId(String addUserId) {
-        this.addUserId = addUserId;
+    public Rating() {
+
     }
 
     public Integer getId() {
@@ -31,27 +34,7 @@ public class Rating {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Integer getPostId() {
-        return postId;
-    }
-
-    public void setPostId(Integer postId) {
-        this.postId = postId;
-    }
-
     public Integer getRatData() {
         return ratData;
-    }
-
-    public void setRatData(Integer ratData) {
-        this.ratData = ratData;
     }
 }

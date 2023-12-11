@@ -13,6 +13,15 @@ public class Subscription {
     String followUserId;      //тот кто подписан
     String subscribeUserId;   //тот на кого подписаны
 
+    public Subscription(String followUserId, String subscribeUserId) {
+        this.followUserId = followUserId;
+        this.subscribeUserId = subscribeUserId;
+    }
+
+    public Subscription() {
+
+    }
+
     public Integer getId() {
         return id;
     }
@@ -21,19 +30,8 @@ public class Subscription {
         this.id = id;
     }
 
-    public String getFollowUserId() {
-        return followUserId;
-    }
-
-    public void setFollowUserId(String followUserId) {
-        this.followUserId = followUserId;
-    }
-
     public String getSubscribeUserId() {
         return subscribeUserId;
     }
 
-    public void setSubscribeUserId(String subscribeUserId) {
-        this.subscribeUserId = subscribeUserId;
-    }
 }
